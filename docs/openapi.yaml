@@ -5,6 +5,8 @@ info:
 servers:
   - url: http://localhost:3000
     description: Local development servers
+  - url: https://task-api-service-r478.onrender.com/
+    description: Production server
 tags:
   - name: Tasks
     description: Task-related endpoints
