@@ -4,6 +4,7 @@
   "description": "A simple Node.js + Express + Prisma API for managing tasks",
   "main": "src/server.js",
   "scripts": {
+    "test": "node --test",
     "dev": "node --env-file=.env --watch src/server.js",
     "start": "node src/server.js",
     "migrate:dev": "npx prisma migrate dev",

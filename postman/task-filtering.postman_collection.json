@@ -1,0 +1,91 @@
+{
+  "info": {
+    "name": "Task API - completed query filtering",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "List all tasks",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Returns 200', () => pm.response.to.have.status(200));",
+              "pm.test('Returns an array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+              "pm.collectionVariables.set('allTasks', JSON.stringify(pm.response.json()));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List completed tasks",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks?completed=true"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Returns 200', () => pm.response.to.have.status(200));",
+              "pm.test('Returns exactly the completed tasks', () => { const all = JSON.parse(pm.collectionVariables.get('allTasks')); const expected = all.filter(task => task.completed === true); const byId = (a, b) => a.id - b.id; pm.expect(pm.response.json().sort(byId)).to.deep.equal(expected.sort(byId)); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List incomplete tasks",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks?completed=false"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Returns 200', () => pm.response.to.have.status(200));",
+              "pm.test('Returns exactly the incomplete tasks', () => { const all = JSON.parse(pm.collectionVariables.get('allTasks')); const expected = all.filter(task => task.completed === false); const byId = (a, b) => a.id - b.id; pm.expect(pm.response.json().sort(byId)).to.deep.equal(expected.sort(byId)); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject invalid completed value",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks?completed=invalid"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Returns 400', () => pm.response.to.have.status(400));",
+              "pm.test('Explains validation error', () => pm.expect(pm.response.json()).to.deep.equal({ error: 'Validation failed', details: ['completed must be true or false'] }));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
