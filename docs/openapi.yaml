@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://localhost:3000
     description: Local development servers
-  - url: https://task-api-service-r478.onrender.com/
+  - url: https://task-api-service-r478.onrender.com
     description: Production server
 tags:
   - name: Tasks
@@ -15,9 +15,23 @@ tags:
 paths:
   /tasks:
     get:
-      summary: List all tasks
+      summary: List tasks, optionally filtered by completion status
       tags:
         - Tasks
+      parameters:
+        - name: completed
+          in: query
+          required: false
+          description: Filter by completion status. Use true for completed tasks or false for incomplete tasks. Omit this parameter to return all tasks. Any other value returns 400 Bad Request.
+          schema:
+            type: boolean
+          examples:
+            completed:
+              summary: Only completed tasks
+              value: true
+            incomplete:
+              summary: Only incomplete tasks
+              value: false
       responses:
         '200':
           description: OK
@@ -27,6 +41,23 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Task'
+        '400':
+          description: The completed query parameter must be exactly true or false.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: array
+                    items:
+                      type: string
+              example:
+                error: Validation failed
+                details:
+                  - completed must be true or false
     post:
       summary: Create a new task
       tags:
